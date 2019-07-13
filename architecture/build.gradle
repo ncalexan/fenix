@@ -43,3 +43,28 @@ dependencies {
     implementation Deps.autodispose_android
     implementation Deps.autodispose_android_aac
 }
+
+android.libraryVariants.all { variant ->
+    // At this point, the Android-Gradle plugin has created all the Android
+    // tasks and configurations.  This is the time for us to declare Glean's
+    // additional variant configurations and artifacts.
+    def stems = ['metrics', 'pings']
+    if (stems.any { stem -> file("$projectDir/${stem}.yaml").exists() }) {
+        project.configurations["${variant.name}RuntimeElements"].outgoing.variants.create("glean-metrics.yaml") { variantConfig ->
+            stems.each { stem ->
+                def f = file("$projectDir/${stem}.yaml")
+                if (f.exists()) {
+                    variantConfig.artifact(f) { artifact ->
+                        artifact.type = "glean-metrics-yaml"
+                        // If in the future we want this to be dynamic, we can use
+                        // `artifact.builtBy(task)`.
+                    }
+
+                    // This packs the given file in the root of the AAR, sibling
+                    // to `AndroidManifest.xml` and `classes.jar`.
+                    variant.packageLibrary.from(f)
+                }
+            }
+        }
+    }
+}
