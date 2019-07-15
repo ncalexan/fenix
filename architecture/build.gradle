@@ -43,3 +43,20 @@ dependencies {
     implementation Deps.autodispose_android
     implementation Deps.autodispose_android_aac
 }
+
+android.libraryVariants.all { variant ->
+    // At this point, the Android-Gradle plugin has created all the Android tasks and
+    // configurations.  This is the time for us to declare additional Glean files to package into
+    // AAR files.  This handles "module" Gradle dependenices but not "project" Gradle dependencies.
+    def stems = ['metrics', 'pings']
+    if (stems.any { stem -> file("$projectDir/${stem}.yaml").exists() }) {
+        // This packs the given file in the root of the AAR, sibling to `AndroidManifest.xml` and
+        // `classes.jar`.
+        stems.each { stem ->
+            def f = file("$projectDir/${stem}.yaml")
+            if (f.exists()) {
+                variant.packageLibrary.from(f)
+            }
+        }
+    }
+}
