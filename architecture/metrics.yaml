@@ -1,0 +1,23 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+
+$schema: moz://mozilla.org/schemas/glean/metrics/1-0-0
+
+events:
+  app_opened3:
+    type: event
+    description: >
+      A user opened the app
+    extra_keys:
+      source:
+        description: "The method used to open Fenix. Possible values are: `app_icon`, `custom_tab` or `link`"
+    bugs:
+    - 968
+    data_reviews:
+    - https://github.com/mozilla-mobile/fenix/pull/1067#issuecomment-474598673
+    notification_emails:
+    - telemetry-client-dev@mozilla.com
+    - fenix-core@mozilla.com
+    expires: "2020-03-01"

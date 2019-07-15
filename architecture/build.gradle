@@ -60,3 +60,28 @@ android.libraryVariants.all { variant ->
         }
     }
 }
+
+android.libraryVariants.all { variant ->
+    // At this point, the Android-Gradle plugin has created all the Android tasks and
+    // configurations.  This is the time for us to declare additional Glean-specific variant
+    // configurations and artifacts.  This handles "project" Gradle dependencies.
+    def stems = ['metrics', 'pings']
+
+    // This is not as stable as referring to `variant.compileConfiguration` directly: it's
+    // possible the Android-Gradle plugin will change the name of this configuration.  However
+    // this is unlikely: "apiElements" is listed in Table 29 as "[a] configuration[s] used by
+    // consumers" at
+    // https://docs.gradle.org/5.5/userguide/userguide_single.html#sec:java_library_configurations_graph.
+    project.configurations["${variant.name}ApiElements"].outgoing.variants.create("glean-metrics-yaml") { variantConfig ->
+        stems.each { stem ->
+            def f = file("$projectDir/${stem}.yaml")
+            if (f.exists()) {
+                variantConfig.artifact(f) { artifact ->
+                    artifact.type = "glean-metrics-yaml"
+                    // If in the future we want this to be dynamic, we can use
+                    // `artifact.builtBy(task)`.
+                }
+            }
+        }
+    }
+}
