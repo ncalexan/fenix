@@ -171,6 +171,16 @@ ext.gleanGenerateMetricsAPI = {
             args "--allow-reserved"
         }
 
+        // Give some indication this task is running, and more when we're running under `--debug`.
+        doFirst {
+            project.logger.lifecycle("${name}: inputs ${inputs.files.files}")
+            if (project.logger.isEnabled(LogLevel.DEBUG)) {
+                // This includes a Python code block on the command line that's not easy to
+                // copy and paste, but it's still useful for debugging.
+                project.logger.lifecycle(commandLine)
+            }
+        }
+
         // Only show the output if something went wrong.
         ignoreExitValue = true
         standardOutput = new ByteArrayOutputStream()
